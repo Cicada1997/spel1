@@ -1,12 +1,17 @@
 use std::time::Duration;
+use std::collections::HashSet;
 
 use sdl2::rect::Rect as SDL_rect;
 use sdl2::render::Canvas as SDL_canvas;
 use sdl2::video::Window as SDL_window;
 use sdl2::pixels::Color;
+
 use sdl2::keyboard::Keycode;
+use sdl2::keyboard::Scancode;
+
 use sdl2::event::Event as SDL_event;
 use sdl2::EventPump as SDL_EventPump;
+
 
 use hecs::World as ECSWorld;
 use hecs::Entity as EntityId;
@@ -47,20 +52,20 @@ impl Game {
         let mut ecs = ECSWorld::new();
 
         let mut player_id = ecs.spawn((
-            Player {
-                name:      "Theo",
-                kill_count: 0
-            },
-            Position {
-                x:          0, 
-                y:          0, 
-            },
-            Health {
-                points:     100,
-                max:        120,
-                regen:      8,
-            },
-            Visual{},
+                Player {
+                    name:      "Theo",
+                    kill_count: 0
+                },
+                Position {
+                    x:          0, 
+                    y:          0, 
+                },
+                Health {
+                    points:     100,
+                    max:        120,
+                    regen:      8,
+                },
+                Visual{},
         ));
 
         let mut game_events = GameEvents::new();
@@ -72,48 +77,39 @@ impl Game {
         }
     }
 
-    pub fn player_events(&mut self, keys: Vec<Keycode>) {
-        if keys.contains(&Keycode::W) {
+    pub fn player_events(&mut self, keys: &HashSet<Scancode>) {
+        if keys.contains(&Scancode::W) {
             self.game_events.append(
                 GameEvent::EntityEvent(
-                    self.player, 
-                    EntityEvent::Move(
-                        Direction::Up
-                    )
+                    self.player,
+                    EntityEvent::Move(Direction::Up)
                 )
             );
         }
 
-        if keys.contains(&Keycode::A) {
+        if keys.contains(&Scancode::A) {
             self.game_events.append(
                 GameEvent::EntityEvent(
-                    self.player, 
-                    EntityEvent::Move(
-                        Direction::Left
-                    )
+                    self.player,
+                    EntityEvent::Move(Direction::Left)
                 )
             );
         }
 
-
-        if keys.contains(&Keycode::S) {
+        if keys.contains(&Scancode::S) {
             self.game_events.append(
                 GameEvent::EntityEvent(
-                    self.player, 
-                    EntityEvent::Move(
-                        Direction::Down
-                    )
+                    self.player,
+                    EntityEvent::Move(Direction::Down)
                 )
             );
         }
 
-        if keys.contains(&Keycode::D) {
+        if keys.contains(&Scancode::D) {
             self.game_events.append(
                 GameEvent::EntityEvent(
-                    self.player, 
-                    EntityEvent::Move(
-                        Direction::Right
-                    )
+                    self.player,
+                    EntityEvent::Move(Direction::Right)
                 )
             );
         }
@@ -123,14 +119,27 @@ impl Game {
         for event in event_pump.poll_iter() {
             match event {
                 SDL_event::Quit {..} |
-                SDL_event::KeyDown { keycode: Some(Keycode::Escape), .. } => { return false },
+                    SDL_event::KeyDown { keycode: Some(Keycode::Escape), .. } => { return false },
                 _ => {}
             }
         }
 
-        let keys = event_pump.keyboard_state().pressed_scancodes().filter_map(Keycode::from_scancode).collect();
-        self.player_events(keys);
+        let keyboard_state = event_pump.keyboard_state();
 
+        const MONITORED_KEYS: &[Scancode] = &[
+            Scancode::W,
+            Scancode::A,
+            Scancode::S,
+            Scancode::D,
+        ];
+
+        let pressed_scancodes: HashSet<Scancode> = MONITORED_KEYS
+            .iter()
+            .filter(|&&scancode| keyboard_state.is_scancode_pressed(scancode))
+            .cloned()
+            .collect();
+
+        self.player_events(&pressed_scancodes);
 
         self.handle_events();
 

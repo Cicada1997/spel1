@@ -17,13 +17,26 @@ use crate::game_events::{
 pub fn entity_movement(ecs: &mut ECSWorld, eid: EntityId, dir: &mut Direction) {
     let mut pos = ecs.query_one_mut::<(&mut Position)>(eid).unwrap();
 
-    let speed = 40;
+    let speed = 5.0;
+
+    let mut x: f64 = 0.0;
+    let mut y: f64 = 0.0;
 
     match dir {
-        Direction::Up    => { pos.y -= speed },
-        Direction::Down  => { pos.y += speed },
-        Direction::Left  => { pos.x -= speed },
-        Direction::Right => { pos.x += speed },
+        Direction::Up    => { y -= speed },
+        Direction::Down  => { y += speed },
+        Direction::Left  => { x -= speed },
+        Direction::Right => { x += speed },
         _ => {}
     }
+
+    // if (x < 0.0 || x > 0.0) && (y < 0.0 && y > 0.0) {
+    //     let  m = (x*x + y*y).sqrt();
+    //     x /= m;
+    //     y /= m;
+    // }
+    //
+    // println!("x_vel: {x}, y_vel: {y}");
+
+    pos.x += x as i32; pos.y += y as i32;
 }

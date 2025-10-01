@@ -1,5 +1,7 @@
-pub struct Direction {
-    x: bool,
-    y: bool,
+pub enum Direction {
+    UP,
+    DOWN,
+    RIGHT,
+    LEFT,
 }
 

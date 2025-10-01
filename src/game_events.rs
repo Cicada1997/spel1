@@ -5,26 +5,48 @@ use crate::components::{
     direction::Direction,
 };
 
-pub enum Event {
-    ENTITY_MOVEMENT(EntityId, Direction),
-    ENTITY_DEATH(EntityId, Position),
-    ATTACK(i32, Position, i32), // @param (strength, position, range)
+pub enum EntityEvent {
+    Move(Direction),
+    Attack(),
+    Death(),
+    Heal()
 }
 
+pub enum GameEvent {
+    EntityEvent(EntityId, EntityEvent)
+}
+
+// pub enum Event {
+//     EntityMovement(EntityId, Direction),
+//     EntityDeath(EntityId, Position),
+//     Attack(EntityId), // @context obtain strength, position and other values 
+//                       // to calculate damage and target.
+//
+//     // Attack(i32, Position, i32), // @param (strength, position, range)
+// }
+
 pub struct GameEvents {
-    events: Vec<Event>,
+    events: Vec<GameEvent>,
 }
 
 impl GameEvents {
     pub fn new() -> Self {
 
-        let events = Vec::<Event>::new();
+        let events = Vec::new();
         Self {
             events: events,
         }
     }
 
-    pub fn append(&mut self, event: Event) {
+    pub fn append(&mut self, event: GameEvent) {
         self.events.push(event);
+    }
+
+    pub fn iter(&mut self) -> &mut Vec<GameEvent> {
+        return &mut self.events
+    }
+
+    pub fn clear(&mut self) {
+        self.events.clear();
     }
 }

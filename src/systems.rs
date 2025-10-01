@@ -2,4 +2,4 @@
 pub mod rendering;
 
 //   ~~~ Player IO ~~~   \\
-// pub mod player_movement;
+pub mod entity_movement;

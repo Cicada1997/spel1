@@ -19,6 +19,7 @@ pub mod components;
 pub mod systems;
 
 pub mod game_events;
+pub mod game_event_handler;
 
 pub mod game;
 pub use game::Game;
